@@ -29,6 +29,7 @@ function App() {
         <p>
           Welcome to the trivia game!
           Players are: {players.join(", ")}
+          {error ? ("Error: "+error) : null}
         </p>
         <a
           className="App-link"
