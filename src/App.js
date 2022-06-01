@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const {data, error} = await supabase.from("players").select("name");
+      const {data, error} = await supabase.from("players").select("*");
       if(error) {
         setError(error);
       } else {
@@ -28,7 +28,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Welcome to the trivia game!
-          Players are: {players.join(", ")}
+          Players are: {players.map(({name}) => name).join(", ")}
           {error ? ("Error: "+error) : null}
         </p>
         <a
