@@ -11,13 +11,15 @@ function App() {
   const [players, setPlayers] = useState([]);
   const [error, setError] = useState(null);
 
-  useEffect(async () => {
-    const {data, error} = await supabase.from("players").select("name");
-    if(error) {
-      setError(error);
-    } else {
-      setPlayers(data);
-    }
+  useEffect(() => {
+    (async () => {
+      const {data, error} = await supabase.from("players").select("name");
+      if(error) {
+        setError(error);
+      } else {
+        setPlayers(data);
+      }
+    })()
   }, [])
 
   return (
