@@ -14,13 +14,13 @@ function App() {
   return <Router>
     <Routes>
       <Route exact path="/" element={<IndexPage />} />
+      <Route exact path="/create" element={<CreateGamePage />} />
       <Route path="*" element={<main>
         {!supabase.auth.user() ? <AuthModal /> : null}
         <Routes>
           <Route exact path="/login" element={<LoginPage />} />
-          <Route exact path="/create" element={<CreateGamePage />} />
           <Route exact path="/join" element={<JoinGamePage />} />
-          <Route exact path="/play/:lobby" element={<GamePage />} />
+          <Route exact path="/game/:uuid" element={<GamePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>}/>
