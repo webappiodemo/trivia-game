@@ -22,11 +22,11 @@ export default function JoinGamePage() {
         <form onSubmit={e => {
             e.preventDefault();
             send({type: "join", lobbyCode, playerName});
-        }} className="flex space-x-16 content-center">
+        }} className="flex flex-col space-y-8 content-center">
             <input
                 type="text"
                 value={lobbyCode}
-                onChange={e => setLobbyCode(e.target.value)}
+                onChange={e => setLobbyCode(e.target.value.toLowerCase())}
                 placeholder="Game code"
             />
             <input

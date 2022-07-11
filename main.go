@@ -22,15 +22,19 @@ type Game struct {
 	HostPlayerId string
 	State        string
 
+	CurrentAnsweringPlayer string
+	questionAnswerable bool
+
 	ServerWS *websocket.Conn `json:"-"`
 }
 
 func (h *Game) sendState(dest *websocket.Conn) {
 	data := gin.H{
-		"code":         h.GameCode,
-		"players":      h.Players,
-		"hostPlayerId": h.HostPlayerId,
-		"state":        h.State,
+		"code":                h.GameCode,
+		"players":             h.Players,
+		"hostPlayerId":        h.HostPlayerId,
+		"state":               h.State,
+		"currAnsweringPlayer": h.CurrentAnsweringPlayer,
 	}
 	err := dest.WriteJSON(data)
 	if err != nil {
@@ -79,6 +83,53 @@ func (h *Game) ServeForPlayer(playerId string, conn *websocket.Conn) {
 				h.State = "WAITING_QUESTION"
 				h.sendUpdate()
 			}
+		}
+		if message.Type == "done_asking" {
+			h.questionAnswerable = true
+		}
+		if message.Type == "answer" && h.questionAnswerable && h.CurrentAnsweringPlayer == "" {
+			h.CurrentAnsweringPlayer = playerId
+			h.State = "PLAYER_ANSWERING"
+			h.sendUpdate()
+		}
+		if message.Type == "skip_question" {
+			h.CurrentAnsweringPlayer = ""
+			h.questionAnswerable = false
+			h.State = "WAITING_QUESTION"
+			h.sendUpdate()
+		}
+		if message.Type == "incorrect" {
+			h.CurrentAnsweringPlayer = ""
+			h.questionAnswerable = true
+			h.State = "WAITING_QUESTION"
+			h.sendUpdate()
+		}
+		if message.Type == "correct_100" {
+			if plr, ok := h.Players[h.CurrentAnsweringPlayer]; ok {
+				plr.Points += 100
+			}
+			h.CurrentAnsweringPlayer = ""
+			h.questionAnswerable = false
+			h.State = "WAITING_QUESTION"
+			h.sendUpdate()
+		}
+		if message.Type == "correct_200" {
+			if plr, ok := h.Players[h.CurrentAnsweringPlayer]; ok {
+				plr.Points += 200
+			}
+			h.CurrentAnsweringPlayer = ""
+			h.questionAnswerable = false
+			h.State = "WAITING_QUESTION"
+			h.sendUpdate()
+		}
+		if message.Type == "correct_300" {
+			if plr, ok := h.Players[h.CurrentAnsweringPlayer]; ok {
+				plr.Points += 300
+			}
+			h.CurrentAnsweringPlayer = ""
+			h.questionAnswerable = false
+			h.State = "WAITING_QUESTION"
+			h.sendUpdate()
 		}
 		log.Print("Got message: " + message.Type)
 	}
