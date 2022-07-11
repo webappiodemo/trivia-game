@@ -154,6 +154,7 @@ func (h *Game) ServeForServer(conn *websocket.Conn) {
 		}
 		if message.Type == "create" {
 			//do nothing
+			continue
 		}
 		log.Print("Got message: " + message.Type)
 	}
@@ -167,11 +168,6 @@ func main() {
 	GamesByCode = make(map[string]*Game)
 
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 	upgrader := websocket.Upgrader{}
 	r.GET("/game-ws", func(ctx *gin.Context) {
 		conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, ctx.Writer.Header())
@@ -204,6 +200,10 @@ func main() {
 					log.Printf("Players is: %#v", GamesByCode)
 				}
 			} else if initialMessage.Type == "create" {
+				if _, ok := GamesByCode[initialMessage.LobbyCode]; ok {
+					//do nothing, game already exists
+					return
+				}
 				log.Println("Game created with id " + initialMessage.LobbyCode)
 				game := &Game{GameCode: initialMessage.LobbyCode}
 				game.State = "NEW"

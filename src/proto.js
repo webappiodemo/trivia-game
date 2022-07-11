@@ -12,7 +12,6 @@ const useProtocol = () => {
 const ProtoProvider = React.memo(({children}) => {
     const [ws, setWS] = useState(null);
     const [data, setData] = useState({});
-    const [wsReady, setWSReady] = useState(false);
 
     useEffect(() => {
         if (ws) {
@@ -26,11 +25,7 @@ const ProtoProvider = React.memo(({children}) => {
                 setData(prevData => ({...prevData, ...JSON.parse(ev.data)}))
             }
             newWS.onclose = ev => {
-                setWSReady(false);
                 reconnect();
-            }
-            newWS.onopen = ev => {
-                setWSReady(true);
             }
             setWS(newWS);
         }
@@ -45,7 +40,6 @@ const ProtoProvider = React.memo(({children}) => {
             }
             ws.send(JSON.stringify(message));
         },
-        wsReady: wsReady,
         ...data
     }}>{children}</ProtoContext.Provider>
 });

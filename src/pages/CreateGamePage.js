@@ -4,14 +4,16 @@ import {Link} from "react-router-dom";
 
 export default function CreateGamePage({gameCode}) {
     const [error, setError] = useState("");
-    const {send, players, wsReady, state, hostPlayerId} = useProtocol();
+    const {send, players, state, hostPlayerId} = useProtocol();
 
     useEffect(() => {
-        if (gameCode && wsReady) {
-            send({type: "create", lobbyCode: gameCode});
-        }
-    }, [gameCode, wsReady]);
-    console.log(wsReady);
+        const interval = setInterval(() => {
+            if (gameCode) {
+                send({type: "create", lobbyCode: gameCode});
+            }
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
 
     if (!state || state === "NEW") {
         return <div className="flex flex-col p-8 items-center">

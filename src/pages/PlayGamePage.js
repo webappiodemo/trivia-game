@@ -31,7 +31,7 @@ export default function PlayGamePage() {
         }
 
         return <div className="flex flex-col p-8">
-            <h1 className="text-center">Waiting for {hostPlayerId} to start game.</h1>
+            <h1 className="text-center">Waiting for {hostPlayerId || "the host"} to start game.</h1>
         </div>
     } else if (state === "WAITING_QUESTION") {
         if (isHost) {
